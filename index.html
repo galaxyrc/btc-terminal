@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminal BTC</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
+<script>window.LightweightCharts||document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>')</script>
+<style>
+:root{--bg:#12161c;--panel:#1a2029;--line:#28313d;--text:#e8e4da;--muted:#8a94a3;--up:#3fb8a0;--down:#e5645a;--gold:#e0b050;
+--sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.4 var(--sans);padding:12px}
+.up{color:var(--up)}.down{color:var(--down)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;padding:4px 4px 12px}
+.sym{color:var(--gold);font-weight:600;font-size:15px}
+#price{font:500 38px/1 var(--mono)}
+#chg{font:500 16px var(--mono)}
+.st{margin-left:auto;font-size:12px;color:var(--muted)}
+.st i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--down);margin-right:6px}
+.st.on i{background:var(--up)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px}
+h2{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.bar{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+.bar button{background:none;border:1px solid var(--line);color:var(--muted);padding:3px 10px;border-radius:4px;font:12px var(--mono);cursor:pointer}
+.bar button.on{color:var(--bg);background:var(--gold);border-color:var(--gold)}
+.bar button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bar .ind{margin-left:auto;font:12px var(--mono);color:var(--muted)}
+#chart{height:430px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.stat span{display:block;color:var(--muted);font-size:12px}
+.stat b{font:500 16px var(--mono)}
+.row{display:flex;justify-content:space-between;font:12px var(--mono);padding:1px 4px;position:relative}
+.row .bg{position:absolute;right:0;top:0;bottom:0;opacity:.18}
+.row span{position:relative}
+.mid{text-align:center;padding:6px 0;font:500 15px var(--mono);border-block:1px solid var(--line);margin:4px 0}
+.mid small{display:block;color:var(--muted);font-size:11px;font-weight:400}
+#trades{max-height:230px;overflow:hidden}
+.imb{height:6px;background:var(--down);border-radius:3px;margin-top:8px;overflow:hidden}
+.imb div{height:100%;background:var(--up);width:50%}
+.side{display:flex;flex-direction:column;gap:10px}
+a{color:inherit}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px;margin-top:10px}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.note{color:var(--muted);font-size:12px;margin-top:8px}
+.ev{padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.ev small{display:block;color:var(--muted);font-size:12px}
+#wh{min-height:60px}
+.fg{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.fg b{font:500 34px var(--mono)}
+@media(max-width:900px){.grid{grid-template-columns:1fr}#chart{height:340px}}
+</style>
+</head>
+<body>
+<header>
+  <span class="sym">BTC/USDT</span>
+  <span id="price" class="num">–</span>
+  <span id="chg" class="num">–</span>
+  <span class="st" id="st"><i></i><span id="stt">Menghubungkan…</span></span>
+</header>
+
+<div class="grid">
+  <div>
+    <div class="panel">
+      <div class="bar" id="tf"></div>
+      <div id="chart"></div>
+    </div>
+    <div class="stats panel">
+      <div class="stat"><span>Tertinggi 24 jam</span><b id="hi" class="num">–</b></div>
+      <div class="stat"><span>Terendah 24 jam</span><b id="lo" class="num">–</b></div>
+      <div class="stat"><span>Volume 24 jam (BTC)</span><b id="vb" class="num">–</b></div>
+      <div class="stat"><span>Volume 24 jam (USDT)</span><b id="vq" class="num">–</b></div>
+      <div class="stat"><span>Harga mark (futures)</span><b id="mark" class="num">–</b></div>
+      <div class="stat"><span>Funding rate</span><b id="fund" class="num">–</b></div>
+      <div class="stat"><span>Funding berikutnya</span><b id="fnext" class="num">–</b></div>
+      <div class="stat"><span>Open interest (BTC)</span><b id="oi" class="num">–</b></div>
+      <div class="stat"><span>Rasio akun long/short</span><b id="ls" class="num">–</b></div>
+      <div class="stat"><span>Support terdekat</span><b id="sup" class="num up">–</b></div>
+      <div class="stat"><span>Resistance terdekat</span><b id="res" class="num down">–</b></div>
+      <div class="stat"><span>Area saat ini</span><b id="zn" class="num">–</b></div>
+      <div class="stat"><span>Sinyal terakhir</span><b id="sg" class="num">–</b></div>
+      <div class="stat"><span>Backtest spot (data termuat, bukan jaminan)</span><b id="bt" class="num" style="font-size:13px">–</b></div>
+    </div>
+  </div>
+
+  <div class="side">
+    <div class="panel">
+      <h2>Order book</h2>
+      <div id="asks"></div>
+      <div class="mid"><span id="mid" class="num">–</span><small id="spread">spread –</small></div>
+      <div id="bids"></div>
+      <div class="imb" title="Hijau: total bid. Merah: total ask."><div id="imb"></div></div>
+      <div style="font:12px var(--mono);color:var(--muted);margin-top:4px" id="imbt">Tekanan beli –</div>
+    </div>
+    <div class="panel">
+      <h2>Transaksi terbaru</h2>
+      <div id="trades"></div>
+    </div>
+  </div>
+</div>
+
+<div class="grid2">
+  <div class="panel"><h2>On-chain Bitcoin</h2>
+    <div class="sg">
+      <div class="stat"><span>Alamat aktif (harian)</span><b id="ac" class="num">–</b></div>
+      <div class="stat"><span>Hash rate</span><b id="hr" class="num">–</b></div>
+      <div class="stat"><span>Biaya cepat / 1 jam</span><b id="fee" class="num">–</b></div>
+      <div class="stat"><span>MVRV</span><b id="mvrv" class="num">–</b></div>
+      <div class="stat"><span>SOPR</span><b id="sopr" class="num">–</b></div>
+      <div class="stat"><span>BTC masuk bursa</span><b id="fin" class="num">–</b></div>
+      <div class="stat"><span>BTC keluar bursa</span><b id="fout" class="num">–</b></div>
+      <div class="stat"><span>Netflow bursa (masuk − keluar)</span><b id="fnet" class="num">–</b></div>
+    </div>
+    <p class="note" id="ocd">Sumber: Coin Metrics Community (harian), mempool.space</p>
+  </div>
+  <div class="panel"><h2>Transaksi besar di mempool</h2>
+    <div id="wh"></div>
+    <p class="note" id="whs">Menghubungkan…</p>
+  </div>
+  <div class="panel"><h2>Sentimen pasar</h2>
+    <div class="fg"><b id="fg" class="num">–</b><span id="fgc">Fear &amp; Greed Index</span></div>
+    <p class="note" id="fgh"></p>
+    <p class="note" style="margin-top:14px">Aliran dana ETF Bitcoin tidak punya API gratis yang bisa dipanggil dari browser. Lihat tabel hariannya di <a href="https://farside.co.uk/btc/" target="_blank" rel="noopener">farside.co.uk/btc</a>.</p>
+  </div>
+  <div class="panel"><h2>Kalender ekonomi AS (minggu ini)</h2><div id="cal"><p class="note">Memuat…</p></div></div>
+  <div class="panel"><h2>Berita kripto</h2><div id="news"><p class="note">Memuat…</p></div></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fmt = (n, d = 2) => Number(n).toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
+const REST = 'https://api.bybit.com/v5';
+const TFS = ['1m','5m','15m','1h','4h','1d'];
+let tf = '1m', C = [], ws = null, retry = null;
+
+/* Chart */
+if (typeof LightweightCharts === 'undefined') {
+  $('stt').textContent = 'Library chart gagal dimuat. Cek koneksi internet, lalu muat ulang.';
+  throw new Error('LightweightCharts tidak termuat');
+}
+const chart = LightweightCharts.createChart($('chart'), {
+  layout: {background: {color: 'transparent'}, textColor: '#8a94a3', fontFamily: 'IBM Plex Mono, monospace'},
+  grid: {vertLines: {color: '#232b36'}, horzLines: {color: '#232b36'}},
+  rightPriceScale: {borderColor: '#28313d'},
+  timeScale: {borderColor: '#28313d', timeVisible: true},
+  crosshair: {mode: 0}
+});
+const candle = chart.addCandlestickSeries({upColor:'#3fb8a0',downColor:'#e5645a',borderVisible:false,wickUpColor:'#3fb8a0',wickDownColor:'#e5645a'});
+const vol = chart.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'v'});
+chart.priceScale('v').applyOptions({scaleMargins:{top:.82,bottom:0}});
+const ema20 = chart.addLineSeries({color:'#e0b050',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
+const ema50 = chart.addLineSeries({color:'#7aa7e0',lineWidth:1,priceLineVisible:false,lastValueVisible:false});
+new ResizeObserver(() => chart.applyOptions({width: $('chart').clientWidth})).observe($('chart'));
+
+function ema(data, n) {
+  const k = 2 / (n + 1); let e = null, out = [];
+  data.forEach((c, i) => {
+    e = e === null ? c.close : c.close * k + e * (1 - k);
+    if (i >= n - 1) out.push({time: c.time, value: e});
+  });
+  return out;
+}
+function rsi(data, n = 14) {
+  if (data.length <= n) return null;
+  let g = 0, l = 0;
+  for (let i = 1; i <= n; i++) { const d = data[i].close - data[i-1].close; d >= 0 ? g += d : l -= d; }
+  g /= n; l /= n;
+  for (let i = n + 1; i < data.length; i++) {
+    const d = data[i].close - data[i-1].close;
+    g = (g * (n - 1) + Math.max(d, 0)) / n;
+    l = (l * (n - 1) + Math.max(-d, 0)) / n;
+  }
+  return l === 0 ? 100 : 100 - 100 / (1 + g / l);
+}
+function redraw(full) {
+  const last = C[C.length - 1];
+  if (full) {
+    candle.setData(C);
+    vol.setData(C.map(c => ({time: c.time, value: c.volume, color: c.close >= c.open ? '#3fb8a055' : '#e5645a55'})));
+    ema20.setData(ema(C, 20)); ema50.setData(ema(C, 50));
+  } else {
+    candle.update(last);
+    vol.update({time: last.time, value: last.volume, color: last.close >= last.open ? '#3fb8a055' : '#e5645a55'});
+    const a = ema(C, 20), b = ema(C, 50);
+    if (a.length) ema20.update(a[a.length-1]);
+    if (b.length) ema50.update(b[b.length-1]);
+  }
+  const r = rsi(C), e20 = ema(C, 20).pop(), e50 = ema(C, 50).pop();
+  $('ind').innerHTML = `EMA20 ${e20 ? fmt(e20.value) : '–'} · EMA50 ${e50 ? fmt(e50.value) : '–'} · RSI14 ${r ? r.toFixed(1) : '–'}`;
+}
+
+/* Timeframe */
+const IV = {'1m':'1','5m':'5','15m':'15','1h':'60','4h':'240','1d':'D'};
+$('tf').innerHTML = TFS.map(t => `<button data-t="${t}">${t}</button>`).join('') + '<span style="width:10px"></span><button data-l="sr" title="Support &amp; resistance dari swing high/low">S/R</button><button data-l="zn" title="Area beli/jual dan sinyal (spot, hanya posisi beli)">Beli/Jual</button><button data-l="fib" title="Fibonacci retracement 120 candle terakhir">Fib</button><button data-l="pv" title="Pivot point harian (UTC)">Pivot</button><span class="ind" id="ind"></span>';
+$('tf').addEventListener('click', e => {
+  if (e.target.dataset.t) setTf(e.target.dataset.t);
+  if (e.target.dataset.l) { show[e.target.dataset.l] = !show[e.target.dataset.l]; markLayers(); drawLevels(); }
+});
+function markTf() { document.querySelectorAll('#tf button[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === tf)); }
+
+async function setTf(t) {
+  tf = t; markTf();
+  connect();
+  try {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+    const r = await fetch(`${REST}/market/kline?category=spot&symbol=BTCUSDT&interval=${IV[tf]}&limit=500`, {signal: ctl.signal});
+    clearTimeout(to);
+    const j = await r.json();
+    if (!j.result || !j.result.list) throw new Error(j.retMsg || 'respons kosong');
+    C = j.result.list.reverse().map(k => ({time: +k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5]}));
+    redraw(true); chart.timeScale().fitContent(); drawLevels();
+  } catch (e) { status(false, 'Tidak bisa mengambil data dari Bybit (' + (e.name === 'AbortError' ? 'waktu habis' : e.message) + '). Kemungkinan diblokir; coba VPN atau DNS lain.'); }
+}
+
+/* WebSocket Bybit (spot) */
+function status(on, text) { $('st').classList.toggle('on', on); $('stt').textContent = text; }
+let ping = null, book = {b: new Map(), a: new Map()};
+function connect() {
+  clearTimeout(retry); clearInterval(ping);
+  if (ws) { ws.onclose = null; ws.close(); }
+  book = {b: new Map(), a: new Map()};
+  ws = new WebSocket('wss://stream.bybit.com/v5/public/spot');
+  const sock = ws;
+  setTimeout(() => { if (sock === ws && ws.readyState !== 1) status(false, 'WebSocket Bybit tidak merespons. Kemungkinan diblokir; coba VPN atau DNS lain.'); }, 8000);
+  ws.onopen = () => {
+    status(true, 'Live (Bybit)');
+    ws.send(JSON.stringify({op: 'subscribe', args: ['tickers.BTCUSDT', `kline.${IV[tf]}.BTCUSDT`, 'publicTrade.BTCUSDT', 'orderbook.50.BTCUSDT']}));
+    ping = setInterval(() => ws.readyState === 1 && ws.send(JSON.stringify({op: 'ping'})), 20000);
+  };
+  ws.onclose = () => { clearInterval(ping); status(false, 'Terputus, mencoba lagi…'); retry = setTimeout(connect, 5000); };
+  ws.onmessage = m => {
+    const d = JSON.parse(m.data);
+    if (!d.topic) return;
+    if (d.topic.startsWith('tickers')) onTicker(d.data);
+    else if (d.topic.startsWith('kline')) d.data.forEach(onKline);
+    else if (d.topic.startsWith('publicTrade')) d.data.forEach(onTrade);
+    else if (d.topic.startsWith('orderbook')) onBook(d);
+  };
+}
+
+let lastPrice = 0;
+function onTicker(d) {
+  if (!d.lastPrice) return;
+  const p = +d.lastPrice, pct = +d.price24hPcnt * 100, diff = p - +d.prevPrice24h;
+  $('price').textContent = fmt(p);
+  $('price').className = 'num ' + (p >= lastPrice ? 'up' : 'down'); lastPrice = p;
+  $('chg').textContent = `${pct >= 0 ? '+' : ''}${fmt(diff)}  (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
+  $('chg').className = 'num ' + (pct >= 0 ? 'up' : 'down');
+  $('hi').textContent = fmt(d.highPrice24h); $('lo').textContent = fmt(d.lowPrice24h);
+  $('vb').textContent = fmt(d.volume24h, 0); $('vq').textContent = fmt(d.turnover24h, 0);
+}
+function onKline(k) {
+  const c = {time: +k.start / 1000, open: +k.open, high: +k.high, low: +k.low, close: +k.close, volume: +k.volume};
+  const last = C[C.length - 1];
+  if (!last || c.time < last.time) return;
+  if (last.time === c.time) C[C.length - 1] = c; else C.push(c);
+  redraw(false);
+}
+const tradeEl = $('trades');
+function onTrade(t) {
+  const sell = t.S === 'Sell', row = document.createElement('div');
+  row.className = 'row ' + (sell ? 'down' : 'up');
+  row.innerHTML = `<span>${fmt(t.p)}</span><span>${(+t.v).toFixed(5)}</span><span style="color:var(--muted)">${new Date(t.T).toLocaleTimeString('id-ID')}</span>`;
+  tradeEl.prepend(row);
+  while (tradeEl.children.length > 16) tradeEl.lastChild.remove();
+}
+function side(rows, color, el, reverse) {
+  const list = rows.slice(0, 10).map(([p, q]) => [+p, +q]);
+  const max = Math.max(...list.map(r => r[1]));
+  const html = list.map(([p, q]) => `<div class="row"><div class="bg" style="width:${q / max * 100}%;background:var(--${color})"></div><span class="${color === 'up' ? 'up' : 'down'}">${fmt(p)}</span><span>${q.toFixed(4)}</span></div>`);
+  el.innerHTML = (reverse ? html.reverse() : html).join('');
+}
+function onBook(d) {
+  if (d.type === 'snapshot') { book.b.clear(); book.a.clear(); }
+  d.data.b.forEach(([p, q]) => +q === 0 ? book.b.delete(p) : book.b.set(p, q));
+  d.data.a.forEach(([p, q]) => +q === 0 ? book.a.delete(p) : book.a.set(p, q));
+  const bids = [...book.b].sort((x, y) => y[0] - x[0]).slice(0, 20);
+  const asks = [...book.a].sort((x, y) => x[0] - y[0]).slice(0, 20);
+  if (!bids.length || !asks.length) return;
+  side(asks, 'down', $('asks'), true); side(bids, 'up', $('bids'), false);
+  const bb = +bids[0][0], ba = +asks[0][0];
+  $('mid').textContent = fmt((bb + ba) / 2);
+  $('spread').textContent = `spread ${fmt(ba - bb)}`;
+  const sum = a => a.reduce((s, r) => s + +r[1], 0), B = sum(bids), A = sum(asks), pct = B / (A + B) * 100;
+  $('imb').style.width = pct + '%';
+  $('imbt').textContent = `Bid ${pct.toFixed(1)}% · Ask ${(100 - pct).toFixed(1)}% (20 level)`;
+}
+
+/* Futures (perpetual linear): funding, open interest, long/short */
+async function futures() {
+  try {
+    const t = await fetch(`${REST}/market/tickers?category=linear&symbol=BTCUSDT`).then(r => r.json());
+    const x = t.result.list[0];
+    $('mark').textContent = fmt(x.markPrice);
+    const fr = +x.fundingRate * 100;
+    $('fund').textContent = fr.toFixed(4) + '%'; $('fund').className = 'num ' + (fr >= 0 ? 'up' : 'down');
+    $('fnext').textContent = new Date(+x.nextFundingTime).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+    $('oi').textContent = fmt(x.openInterest, 0);
+  } catch (e) { /* data futures opsional */ }
+  try {
+    const l = await fetch(`${REST}/market/account-ratio?category=linear&symbol=BTCUSDT&period=5min&limit=1`).then(r => r.json());
+    const r0 = l.result.list[0];
+    if (r0) $('ls').textContent = `${(+r0.buyRatio * 100).toFixed(1)}% / ${(+r0.sellRatio * 100).toFixed(1)}%`;
+  } catch (e) {}
+}
+
+/* Panel on-chain, whale, sentimen, kalender, berita (semua teks lewat textContent) */
+const el = (t, txt, cls) => { const e = document.createElement(t); if (txt != null) e.textContent = txt; if (cls) e.className = cls; return e; };
+async function getJ(u, ms = 10000) {
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  try { const r = await fetch(u, {signal: c.signal}); if (!r.ok) throw new Error(r.status); return await r.json(); }
+  finally { clearTimeout(t); }
+}
+const set = (id, t, cls) => { $(id).textContent = t; $(id).className = 'num' + (cls ? ' ' + cls : ''); };
+const na = id => set(id, 'tidak tersedia');
+const CM = 'https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&frequency=1d&paging_from=end&limit_per_asset=4&metrics=';
+async function cm(m) {
+  const j = await getJ(CM + m);
+  const rows = j.data.filter(r => r[m] != null).sort((a, b) => a.time < b.time ? -1 : 1);
+  if (!rows.length) throw new Error('kosong');
+  const r = rows[rows.length - 1]; return {v: +r[m], d: r.time.slice(0, 10)};
+}
+async function onchain() {
+  const [ac, mv, fi, fo, so] = await Promise.allSettled(['AdrActCnt', 'CapMVRVCur', 'FlowInExNtv', 'FlowOutExNtv', 'SOPR'].map(cm));
+  const ok = x => x.status === 'fulfilled';
+  ok(ac) ? set('ac', fmt(ac.value.v, 0)) : na('ac');
+  ok(mv) ? set('mvrv', mv.value.v.toFixed(2)) : na('mvrv');
+  ok(so) ? set('sopr', so.value.v.toFixed(3)) : set('sopr', 'butuh sumber berbayar');
+  ok(fi) ? set('fin', fmt(fi.value.v, 0)) : na('fin');
+  ok(fo) ? set('fout', fmt(fo.value.v, 0)) : na('fout');
+  if (ok(fi) && ok(fo)) { const n = fi.value.v - fo.value.v; set('fnet', (n > 0 ? '+' : '') + fmt(n, 0), n > 0 ? 'down' : 'up'); } else na('fnet');
+  const d = [ac, mv, fi].find(ok);
+  if (d) $('ocd').textContent = 'Data harian terakhir: ' + d.value.d + ' (Coin Metrics Community). Netflow positif = lebih banyak BTC masuk bursa.';
+}
+async function chain() {
+  try { const f = await getJ('https://mempool.space/api/v1/fees/recommended'); set('fee', `${f.fastestFee} / ${f.hourFee} sat/vB`); } catch (e) { na('fee'); }
+  try { const h = await getJ('https://mempool.space/api/v1/mining/hashrate/3d'); set('hr', (h.currentHashrate / 1e18).toFixed(0) + ' EH/s'); } catch (e) { na('hr'); }
+}
+
+const WHALE_MIN = 100;
+function whales() {
+  const w = new WebSocket('wss://ws.blockchain.info/inv');
+  w.onopen = () => { w.send(JSON.stringify({op: 'unconfirmed_sub'})); $('whs').textContent = `Menunggu transaksi ≥ ${WHALE_MIN} BTC. Angka = total output (termasuk kembalian), bukan jaminan pembelian atau penjualan.`; };
+  w.onmessage = m => {
+    const d = JSON.parse(m.data); if (d.op !== 'utx') return;
+    const btc = d.x.out.reduce((s, o) => s + o.value, 0) / 1e8; if (btc < WHALE_MIN) return;
+    const row = el('div', null, 'row'), a = el('a', d.x.hash.slice(0, 10) + '…');
+    if (/^[0-9a-f]{64}$/.test(d.x.hash)) { a.href = 'https://mempool.space/tx/' + d.x.hash; a.target = '_blank'; a.rel = 'noopener'; }
+    a.style.color = 'var(--gold)';
+    row.append(el('span', fmt(btc, 1) + ' BTC'), el('span', '≈ $' + fmt(btc * lastPrice / 1e6, 1) + ' jt'), a);
+    $('wh').prepend(row); while ($('wh').children.length > 12) $('wh').lastChild.remove();
+  };
+  w.onclose = () => { $('whs').textContent = 'Terputus dari ws.blockchain.info, mencoba lagi…'; setTimeout(whales, 5000); };
+}
+
+const FG = {'Extreme Fear': 'Ketakutan ekstrem', 'Fear': 'Takut', 'Neutral': 'Netral', 'Greed': 'Serakah', 'Extreme Greed': 'Serakah ekstrem'};
+async function fng() {
+  try {
+    const d = (await getJ('https://api.alternative.me/fng/?limit=8')).data, v = +d[0].value;
+    set('fg', v, v < 50 ? 'down' : v > 50 ? 'up' : '');
+    $('fgc').textContent = FG[d[0].value_classification] || d[0].value_classification;
+    $('fgh').textContent = `Kemarin ${d[1].value} · Seminggu lalu ${d[7].value} · Sumber: alternative.me`;
+  } catch (e) { $('fgc').textContent = 'Fear & Greed tidak bisa dimuat'; }
+}
+async function calendar() {
+  const box = $('cal');
+  try {
+    const j = await getJ('https://nfs.faireconomy.media/ff_calendar_thisweek.json');
+    const items = j.filter(x => x.country === 'USD' && ['High', 'Medium'].includes(x.impact) && +new Date(x.date) > Date.now() - 36e5)
+      .sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 8);
+    box.replaceChildren(...(items.length ? items.map(x => {
+      const e = el('div', null, 'ev'); e.append(el('span', x.title));
+      const when = new Date(x.date).toLocaleString('id-ID', {weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'});
+      e.append(el('small', `${when} · dampak ${x.impact === 'High' ? 'tinggi' : 'sedang'}${x.forecast ? ' · prakiraan ' + x.forecast : ''}${x.previous ? ' · sebelumnya ' + x.previous : ''}`));
+      return e;
+    }) : [el('p', 'Tidak ada rilis berdampak tinggi/sedang yang tersisa minggu ini.', 'note')]));
+  } catch (e) {
+    const p = el('p', 'Kalender tidak bisa dimuat dari browser. Buka ', 'note'), a = el('a', 'kalender ekonomi Investing.com');
+    a.href = 'https://www.investing.com/economic-calendar/'; a.target = '_blank'; a.rel = 'noopener'; p.append(a, '.'); box.replaceChildren(p);
+  }
+}
+async function news() {
+  try {
+    const j = await getJ('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+    $('news').replaceChildren(...j.Data.slice(0, 7).map(n => {
+      const e = el('div', null, 'ev'), a = el('a', n.title);
+      if (/^https?:\/\//.test(n.url)) { a.href = n.url; a.target = '_blank'; a.rel = 'noopener'; }
+      e.append(a, el('small', `${n.source} · ${new Date(n.published_on * 1000).toLocaleString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})}`));
+      return e;
+    }));
+  } catch (e) { $('news').replaceChildren(el('p', 'Berita tidak bisa dimuat. Coba lagi nanti.', 'note')); }
+}
+onchain(); chain(); whales(); fng(); calendar(); news();
+setInterval(onchain, 1800000); setInterval(chain, 60000); setInterval(fng, 1800000); setInterval(calendar, 1800000); setInterval(news, 300000);
+
+/* Level di chart: support/resistance (swing), Fibonacci, pivot harian */
+const show = {sr: true, zn: true, fib: false, pv: false}; let lines = [], dayP = null;
+const TOL = {'1m': .0015, '5m': .002, '15m': .003, '1h': .004, '4h': .006, '1d': .01};
+function markLayers() { document.querySelectorAll('#tf button[data-l]').forEach(b => b.classList.toggle('on', show[b.dataset.l])); }
+function addLine(price, color, title, style = 0, width = 1) {
+  lines.push(candle.createPriceLine({price, color, lineWidth: width, lineStyle: style, axisLabelVisible: true, title}));
+}
+function swingLevels(d = C) {
+  const w = 5, pts = [];
+  for (let i = w; i < d.length - w; i++) {
+    let hi = true, lo = true;
+    for (let j = i - w; j <= i + w; j++) { if (d[j].high > d[i].high) hi = false; if (d[j].low < d[i].low) lo = false; }
+    if (hi) pts.push(d[i].high);
+    if (lo) pts.push(d[i].low);
+  }
+  pts.sort((a, b) => a - b);
+  const cl = [];
+  pts.forEach(p => {
+    const c = cl[cl.length - 1];
+    if (c && (p - c.start) / c.start < TOL[tf]) { c.n++; c.sum += p; } else cl.push({start: p, sum: p, n: 1});
+  });
+  return cl.map(c => ({price: c.sum / c.n, n: c.n}));
+}
+function drawLevels() {
+  lines.forEach(l => candle.removePriceLine(l)); lines = [];
+  if (C.length < 30) return;
+  const last = C[C.length - 1].close, lv = swingLevels();
+  let strong = lv.filter(l => l.n >= 2); if (strong.length < 4) strong = lv;
+  const sup = strong.filter(l => l.price < last).sort((a, b) => b.price - a.price).slice(0, 3);
+  const res = strong.filter(l => l.price > last).sort((a, b) => a.price - b.price).slice(0, 3);
+  const near = (l, id) => $(id).textContent = l ? `${fmt(l.price)} (${((l.price - last) / last * 100).toFixed(2)}%)` : '–';
+  near(sup[0], 'sup'); near(res[0], 'res'); buySell();
+  if (show.sr) {
+    sup.forEach(l => addLine(l.price, '#3fb8a0', `S ×${l.n}`, 0, l.n >= 4 ? 2 : 1));
+    res.forEach(l => addLine(l.price, '#e5645a', `R ×${l.n}`, 0, l.n >= 4 ? 2 : 1));
+  }
+  if (show.fib) {
+    const seg = C.slice(-120); let hi = seg[0], lo = seg[0];
+    seg.forEach(c => { if (c.high > hi.high) hi = c; if (c.low < lo.low) lo = c; });
+    const up = lo.time < hi.time, H = hi.high, L = lo.low;
+    [.236, .382, .5, .618, .786].forEach(r => addLine(up ? H - (H - L) * r : L + (H - L) * r, '#e0b050', `Fib ${(r * 100).toFixed(1)}%`, 1));
+  }
+  if (show.pv && dayP) {
+    const P = (dayP.H + dayP.L + dayP.c) / 3, rng = dayP.H - dayP.L;
+    [['R2', P + rng], ['R1', 2 * P - dayP.L], ['PP', P], ['S1', 2 * P - dayP.H], ['S2', P - rng]].forEach(([t, v]) => addLine(v, '#7aa7e0', t, 2));
+  }
+}
+async function pivotData() {
+  try {
+    const j = await getJ(`${REST}/market/kline?category=spot&symbol=BTCUSDT&interval=D&limit=2`);
+    const k = j.result.list[1]; dayP = {H: +k[2], L: +k[3], c: +k[4]}; drawLevels();
+  } catch (e) { /* pivot opsional */ }
+}
+/* Area beli/jual + sinyal untuk spot (long only), aturan sederhana dan tanpa lookahead */
+const K = 0.5, FEE = 0.001, RSI_BUY = 45, RSI_SELL = 55;
+function rsiArr(d, n = 14) {
+  const o = new Array(d.length).fill(null); if (d.length <= n) return o;
+  let g = 0, l = 0;
+  for (let i = 1; i <= n; i++) { const x = d[i].close - d[i-1].close; x >= 0 ? g += x : l -= x; }
+  g /= n; l /= n; o[n] = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+  for (let i = n + 1; i < d.length; i++) {
+    const x = d[i].close - d[i-1].close;
+    g = (g * (n - 1) + Math.max(x, 0)) / n; l = (l * (n - 1) + Math.max(-x, 0)) / n;
+    o[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+  }
+  return o;
+}
+function atrArr(d, n = 14) {
+  const o = new Array(d.length).fill(null); let a = 0;
+  for (let i = 1; i < d.length; i++) {
+    const tr = Math.max(d[i].high - d[i].low, Math.abs(d[i].high - d[i-1].close), Math.abs(d[i].low - d[i-1].close));
+    if (i <= n) { a += tr; if (i === n) { a /= n; o[i] = a; } } else { a = (a * (n - 1) + tr) / n; o[i] = a; }
+  }
+  return o;
+}
+function nearLevels(d) {
+  const lv = swingLevels(d); let st = lv.filter(l => l.n >= 2); if (st.length < 4) st = lv;
+  const last = d[d.length - 1].close;
+  return {s: st.filter(l => l.price < last).sort((a, b) => b.price - a.price)[0], r: st.filter(l => l.price > last).sort((a, b) => a.price - b.price)[0]};
+}
+function buySell() {
+  const mk = [], trades = [];
+  if (C.length < 80) { candle.setMarkers([]); return; }
+  const rs = rsiArr(C), at = atrArr(C); let pos = null, lastEv = null;
+  const exit = (c, k) => { trades.push(c.close * (1 - FEE) / (pos.p * (1 + FEE)) - 1); mk.push({c, k}); lastEv = {c, k}; pos = null; };
+  for (let i = 60; i < C.length; i++) {
+    const c = C[i], a = at[i]; if (!a || rs[i] == null) continue;
+    const {s, r} = nearLevels(C.slice(Math.max(0, i - 300), i));
+    if (!pos) {
+      if (s && c.low <= s.price + K * a && c.close >= s.price && rs[i] < RSI_BUY) { pos = {p: c.close, stop: s.price - a}; mk.push({c, k: 'buy'}); lastEv = {c, k: 'buy'}; }
+    } else if (c.close < pos.stop) exit(c, 'stop');
+    else if (r && c.high >= r.price - K * a && c.close <= r.price && rs[i] > RSI_SELL) exit(c, 'sell');
+  }
+  const M = {buy: ['belowBar', '#3fb8a0', 'arrowUp', 'BELI'], sell: ['aboveBar', '#e5645a', 'arrowDown', 'JUAL'], stop: ['aboveBar', '#e0b050', 'arrowDown', 'STOP']};
+  candle.setMarkers(show.zn ? mk.map(({c, k}) => ({time: c.time, position: M[k][0], color: M[k][1], shape: M[k][2], text: M[k][3]})) : []);
+  // area saat ini
+  const a = at[at.length - 1], last = C[C.length - 1].close, {s, r} = nearLevels(C);
+  let zone = 'Netral', cls = '';
+  if (a && s && last <= s.price + K * a) { zone = 'Zona beli'; cls = 'up'; }
+  else if (a && r && last >= r.price - K * a) { zone = 'Zona jual'; cls = 'down'; }
+  set('zn', zone + (pos ? ' · posisi terbuka' : ''), cls);
+  if (show.zn && a) {
+    if (s) { addLine(s.price + K * a, '#3fb8a0', 'Zona beli', 3); addLine(s.price - K * a, '#3fb8a0', '', 3); }
+    if (r) { addLine(r.price + K * a, '#e5645a', '', 3); addLine(r.price - K * a, '#e5645a', 'Zona jual', 3); }
+  }
+  const lbl = {buy: 'BELI', sell: 'JUAL', stop: 'STOP'};
+  set('sg', lastEv ? `${lbl[lastEv.k]} @ ${fmt(lastEv.c.close, 0)} (${new Date(lastEv.c.time * 1000).toLocaleString('id-ID', {day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'})})` : 'belum ada', lastEv ? (lastEv.k === 'buy' ? 'up' : 'down') : '');
+  const n = trades.length, win = trades.filter(t => t > 0).length, tot = trades.reduce((x, t) => x * (1 + t), 1) - 1, bh = last / C[60].close - 1;
+  const unreal = pos ? `, terbuka ${((last / pos.p - 1) * 100).toFixed(2)}%` : '';
+  set('bt', n ? `${n} trade · menang ${(win / n * 100).toFixed(0)}% · ${(tot * 100).toFixed(1)}% vs tahan ${(bh * 100).toFixed(1)}%${unreal}` : `belum ada trade selesai${unreal}`);
+}
+
+markLayers(); pivotData(); setInterval(drawLevels, 20000); setInterval(pivotData, 300000);
+
+markTf(); setTf('1m'); futures(); setInterval(futures, 15000);
+</script>
+</body>
+</html>
