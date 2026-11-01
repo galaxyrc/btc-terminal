@@ -8,132 +8,129 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.3/lightweight-charts.standalone.production.js"></script>
 <script>window.LightweightCharts||document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>')</script>
 <style>
-:root{--bg:#12161c;--panel:#1a2029;--line:#28313d;--text:#e8e4da;--muted:#8a94a3;--up:#3fb8a0;--down:#e5645a;--gold:#e0b050;
+:root{--bg:#090d15;--line:#1c2638;--text:#eef1f6;--muted:#7f8ba0;--up:#2ecc8f;--down:#ff6b6b;--gold:#f7a928;
 --sans:'IBM Plex Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box;margin:0}
-body{background:var(--bg);color:var(--text);font:14px/1.4 var(--sans);padding:12px}
-.up{color:var(--up)}.down{color:var(--down)}
+body{background:radial-gradient(900px 500px at 85% -10%,#17233b 0,transparent 60%),var(--bg);color:var(--text);font:14px/1.4 var(--sans);padding:14px;min-height:100vh}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+a{color:inherit}.up{color:var(--up)}.down{color:var(--down)}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 28px;padding:4px 4px 12px}
-.sym{color:var(--gold);font-weight:600;font-size:15px}
-#price{font:500 38px/1 var(--mono)}
-#chg{font:500 16px var(--mono)}
-.st{margin-left:auto;font-size:12px;color:var(--muted)}
-.st i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--down);margin-right:6px}
-.st.on i{background:var(--up)}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:10px}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px}
-h2{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}
-.bar{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
-.bar button{background:none;border:1px solid var(--line);color:var(--muted);padding:3px 10px;border-radius:4px;font:12px var(--mono);cursor:pointer}
-.bar button.on{color:var(--bg);background:var(--gold);border-color:var(--gold)}
-.bar button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.card{background:linear-gradient(160deg,#141c2d,#0d1320);border:1px solid var(--line);border-radius:20px;padding:16px}
+.card h3{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:600}
+.top{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,#f7b733,#d9822b);color:#1a1205;display:grid;place-items:center;font:700 22px var(--sans)}
+.top h1{font-size:22px;line-height:1.1}.top small{color:var(--muted);font-size:13px}
+.live{margin-left:auto;display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:12px;color:var(--muted);max-width:55vw;line-height:1.25}
+.live i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--down)}.live.on i{background:var(--up)}.live.on{color:var(--text)}
+.ic{background:none;border:1px solid var(--line);color:var(--muted);width:40px;height:40px;border-radius:13px;font-size:18px;cursor:pointer}
+.rail{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none}.rail::-webkit-scrollbar{display:none}
+.mini{flex:0 0 auto;min-width:230px;display:flex;align-items:center;gap:14px}
+.mini small{display:block;color:var(--muted);font-size:12px}.mini b{display:block;font:600 26px var(--mono);line-height:1.2}
+.mini .l{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.gauge{width:92px;flex:none}
+.hh{display:flex;align-items:center;gap:14px}
+.coin{width:52px;height:52px;border-radius:50%;background:#3a2a12;color:var(--gold);display:grid;place-items:center;font:600 15px var(--mono)}
+.hh h2{font-size:24px;line-height:1.1}.hh small{color:var(--muted)}
+.pill{margin-left:auto;border-radius:999px;padding:6px 12px;font:600 14px var(--mono);background:#123024;border:1px solid #1d5a3b;color:var(--up)}
+.pill.down{background:#3a1820;border-color:#6a2a35;color:var(--down)}
+.px{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:14px 0}
+#price{font:600 42px/1 var(--mono)}#chg{font:500 15px var(--mono)}
+.lab{display:flex;justify-content:space-between;font:12px var(--mono);color:var(--muted);letter-spacing:.04em}
+.track{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#1c5a45,#2a3347 50%,#5a2a35);margin:10px 0}
+.track i{position:absolute;top:50%;left:50%;width:18px;height:18px;border-radius:50%;background:var(--gold);border:4px solid #3a2a12;transform:translate(-50%,-50%);transition:left .4s}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:16px 0 12px;scrollbar-width:none}
+.chip{flex:1 0 76px;background:#0b111c;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.chip span{display:block;color:var(--muted);font:12px var(--mono)}.chip b{font:600 14px var(--mono)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:#0b111c;border:1px solid var(--line);border-radius:14px;padding:12px}
+.tile span{display:block;color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.tile b{font:600 16px var(--mono);overflow-wrap:anywhere}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}
+.bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.bar button{background:none;border:1px solid var(--line);color:var(--muted);padding:5px 12px;border-radius:999px;font:12px var(--mono);cursor:pointer}
+.bar button.on{color:#1a1205;background:var(--gold);border-color:var(--gold)}
+.bar button:focus-visible,.ic:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .bar .ind{margin-left:auto;font:12px var(--mono);color:var(--muted)}
-#chart{height:430px}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
-.stat span{display:block;color:var(--muted);font-size:12px}
-.stat b{font:500 16px var(--mono)}
+#chart{height:400px}
+.coincard{flex:0 0 auto;min-width:200px;text-align:left;background:linear-gradient(160deg,#141c2d,#0d1320);border:1px solid var(--line);border-radius:20px;padding:14px;color:var(--text);font:inherit;cursor:pointer}
+.coincard.on{border-color:var(--gold)}.coincard:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.coincard .r{display:flex;align-items:center;gap:10px}.coincard b{display:block}.coincard small{color:var(--muted)}
+.ci{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:600 10px var(--mono)}
+.coincard .p{display:block;font:600 19px var(--mono);margin:10px 0 2px}.coincard .c{font:600 12px var(--mono)}
 .row{display:flex;justify-content:space-between;font:12px var(--mono);padding:1px 4px;position:relative}
-.row .bg{position:absolute;right:0;top:0;bottom:0;opacity:.18}
-.row span{position:relative}
+.row .bg{position:absolute;right:0;top:0;bottom:0;opacity:.18}.row span{position:relative}
 .mid{text-align:center;padding:6px 0;font:500 15px var(--mono);border-block:1px solid var(--line);margin:4px 0}
 .mid small{display:block;color:var(--muted);font-size:11px;font-weight:400}
 #trades{max-height:230px;overflow:hidden}
-.imb{height:6px;background:var(--down);border-radius:3px;margin-top:8px;overflow:hidden}
-.imb div{height:100%;background:var(--up);width:50%}
-.side{display:flex;flex-direction:column;gap:10px}
-a{color:inherit}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px;margin-top:10px}
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.imb{height:6px;background:var(--down);border-radius:3px;margin-top:8px;overflow:hidden}.imb div{height:100%;background:var(--up);width:50%}
 .note{color:var(--muted);font-size:12px;margin-top:8px}
-.ev{padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
-.ev small{display:block;color:var(--muted);font-size:12px}
+.ev{padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}.ev small{display:block;color:var(--muted);font-size:12px}
 #wh{min-height:60px}
-.fg{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.fg b{font:500 34px var(--mono)}
-@media(max-width:900px){.grid{grid-template-columns:1fr}#chart{height:340px}}
+@media(max-width:700px){#chart{height:320px}#price{font-size:38px}}
 </style>
 </head>
 <body>
-<header>
-  <span class="sym">BTC/USDT</span>
-  <span id="price" class="num">–</span>
-  <span id="chg" class="num">–</span>
-  <span class="st" id="st"><i></i><span id="stt">Menghubungkan…</span></span>
+<main>
+<header class="top">
+  <div class="logo">T</div>
+  <div><h1>Terminal</h1><small id="upd">Update –</small></div>
+  <span class="live" id="st"><i></i><span id="stt">Menghubungkan…</span></span>
+  <button class="ic" id="rf" aria-label="Muat ulang data">↻</button>
 </header>
+<div class="rail" id="coins"></div>
 
-<div class="grid">
-  <div>
-    <div class="panel">
-      <div class="bar" id="tf"></div>
-      <div id="chart"></div>
-    </div>
-    <div class="stats panel">
-      <div class="stat"><span>Tertinggi 24 jam</span><b id="hi" class="num">–</b></div>
-      <div class="stat"><span>Terendah 24 jam</span><b id="lo" class="num">–</b></div>
-      <div class="stat"><span>Volume 24 jam (BTC)</span><b id="vb" class="num">–</b></div>
-      <div class="stat"><span>Volume 24 jam (USDT)</span><b id="vq" class="num">–</b></div>
-      <div class="stat"><span>Harga mark (futures)</span><b id="mark" class="num">–</b></div>
-      <div class="stat"><span>Funding rate</span><b id="fund" class="num">–</b></div>
-      <div class="stat"><span>Funding berikutnya</span><b id="fnext" class="num">–</b></div>
-      <div class="stat"><span>Open interest (BTC)</span><b id="oi" class="num">–</b></div>
-      <div class="stat"><span>Rasio akun long/short</span><b id="ls" class="num">–</b></div>
-      <div class="stat"><span>Support terdekat</span><b id="sup" class="num up">–</b></div>
-      <div class="stat"><span>Resistance terdekat</span><b id="res" class="num down">–</b></div>
-      <div class="stat"><span>Area saat ini</span><b id="zn" class="num">–</b></div>
-      <div class="stat"><span>Sinyal terakhir</span><b id="sg" class="num">–</b></div>
-      <div class="stat"><span>Backtest spot (data termuat, bukan jaminan)</span><b id="bt" class="num" style="font-size:13px">–</b></div>
-    </div>
+<div class="rail">
+  <div class="card mini">
+    <svg class="gauge" viewBox="0 0 100 56" aria-hidden="true"><defs><linearGradient id="gg"><stop offset="0" stop-color="#ff6b6b"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#2ecc8f"/></linearGradient></defs><path d="M10 50A40 40 0 0 1 90 50" fill="none" stroke="url(#gg)" stroke-width="7" stroke-linecap="round"/><circle id="gdot" cx="10" cy="50" r="5" fill="#fff" stroke="#0d1320" stroke-width="2"/></svg>
+    <div><small class="l">Fear &amp; Greed</small><b id="fg" class="num">–</b><small><span id="fgc">–</span><span id="fgh"></span></small></div>
   </div>
-
-  <div class="side">
-    <div class="panel">
-      <h2>Order book</h2>
-      <div id="asks"></div>
-      <div class="mid"><span id="mid" class="num">–</span><small id="spread">spread –</small></div>
-      <div id="bids"></div>
-      <div class="imb" title="Hijau: total bid. Merah: total ask."><div id="imb"></div></div>
-      <div style="font:12px var(--mono);color:var(--muted);margin-top:4px" id="imbt">Tekanan beli –</div>
-    </div>
-    <div class="panel">
-      <h2>Transaksi terbaru</h2>
-      <div id="trades"></div>
-    </div>
-  </div>
+  <div class="card mini"><div><small class="l">Market cap kripto</small><b id="gmc" class="num">–</b><small id="gmcc" class="num">24j</small></div></div>
+  <div class="card mini"><div><small class="l">Dominasi BTC</small><b id="gdom" class="num">–</b><small>dari total market cap</small></div></div>
 </div>
 
-<div class="grid2">
-  <div class="panel"><h2>On-chain Bitcoin</h2>
-    <div class="sg">
-      <div class="stat"><span>Alamat aktif (harian)</span><b id="ac" class="num">–</b></div>
-      <div class="stat"><span>Hash rate</span><b id="hr" class="num">–</b></div>
-      <div class="stat"><span>Biaya cepat / 1 jam</span><b id="fee" class="num">–</b></div>
-      <div class="stat"><span>MVRV</span><b id="mvrv" class="num">–</b></div>
-      <div class="stat"><span>SOPR</span><b id="sopr" class="num">–</b></div>
-      <div class="stat"><span>BTC masuk bursa</span><b id="fin" class="num">–</b></div>
-      <div class="stat"><span>BTC keluar bursa</span><b id="fout" class="num">–</b></div>
-      <div class="stat"><span>Netflow bursa (masuk − keluar)</span><b id="fnet" class="num">–</b></div>
-    </div>
-    <p class="note" id="ocd">Sumber: Coin Metrics Community (harian), mempool.space</p>
+<section class="card">
+  <div class="hh"><div class="coin" id="cicon">BTC</div><div><h2 id="hname">Bitcoin</h2><small id="rank">BTC · BTC/USDT</small></div><span class="pill" id="p24">–</span></div>
+  <div class="px"><span id="price" class="num">–</span><span id="chg" class="num">–</span></div>
+  <div class="lab"><span>POSISI ANTARA S1 DAN R1</span><span id="rpos">–</span></div>
+  <div class="track"><i id="dot"></i></div>
+  <div class="lab"><b class="up" id="s1">S1 –</b><b class="down" id="r1">R1 –</b></div>
+  <div class="chips">
+    <div class="chip"><span>24J</span><b id="c24" class="num">–</b></div><div class="chip"><span>7H</span><b id="c7" class="num">–</b></div>
+    <div class="chip"><span>30H</span><b id="c30" class="num">–</b></div><div class="chip"><span>90H</span><b id="c90" class="num">–</b></div>
+    <div class="chip"><span>1T</span><b id="c1y" class="num">–</b></div>
   </div>
-  <div class="panel"><h2>Transaksi besar di mempool</h2>
-    <div id="wh"></div>
-    <p class="note" id="whs">Menghubungkan…</p>
-  </div>
-  <div class="panel"><h2>Sentimen pasar</h2>
-    <div class="fg"><b id="fg" class="num">–</b><span id="fgc">Fear &amp; Greed Index</span></div>
-    <p class="note" id="fgh"></p>
-    <p class="note" style="margin-top:14px">Aliran dana ETF Bitcoin tidak punya API gratis yang bisa dipanggil dari browser. Lihat tabel hariannya di <a href="https://farside.co.uk/btc/" target="_blank" rel="noopener">farside.co.uk/btc</a>.</p>
-  </div>
-  <div class="panel"><h2>Kalender ekonomi AS (minggu ini)</h2><div id="cal"><p class="note">Memuat…</p></div></div>
-  <div class="panel"><h2>Berita kripto</h2><div id="news"><p class="note">Memuat…</p></div></div>
-</div>
+  <div class="tiles"><div class="tile"><span>Market cap</span><b id="mc" class="num">–</b></div><div class="tile"><span>Volume 24j</span><b id="vol" class="num">–</b></div><div class="tile"><span>Vol / Mcap</span><b id="vm" class="num">–</b></div><div class="tile"><span>Supply</span><b id="supl" class="num">–</b></div></div>
+</section>
 
+<section class="card"><h3>Chart</h3><div class="bar" id="tf"></div><div id="chart"></div></section>
+
+<div class="cols">
+  <section class="card"><h3>Level &amp; sinyal</h3><div class="tiles"><div class="tile"><span>Support terdekat</span><b id="sup" class="num" style="color:var(--up)">–</b></div><div class="tile"><span>Resistance terdekat</span><b id="res" class="num" style="color:var(--down)">–</b></div><div class="tile"><span>Area saat ini</span><b id="zn" class="num">–</b></div><div class="tile"><span>Sinyal terakhir</span><b id="sg" class="num">–</b></div><div class="tile"><span>Backtest spot (bukan jaminan)</span><b id="bt" class="num" style="font-size:13px">–</b></div></div></section>
+  <section class="card"><h3>Spot Binance 24 jam</h3><div class="tiles"><div class="tile"><span>Tertinggi</span><b id="hi" class="num">–</b></div><div class="tile"><span>Terendah</span><b id="lo" class="num">–</b></div><div class="tile"><span>Volume (BTC)</span><b id="vb" class="num">–</b></div><div class="tile"><span>Volume (USDT)</span><b id="vq" class="num">–</b></div></div></section>
+  <section class="card perp-only"><h3>Futures perpetual</h3><div class="tiles"><div class="tile"><span>Harga mark</span><b id="mark" class="num">–</b></div><div class="tile"><span>Funding rate</span><b id="fund" class="num">–</b></div><div class="tile"><span>Funding berikutnya</span><b id="fnext" class="num">–</b></div><div class="tile"><span>Open interest (BTC)</span><b id="oi" class="num">–</b></div><div class="tile"><span>Long / short akun</span><b id="ls" class="num">–</b></div></div></section>
+  <section class="card"><h3>Order book</h3>
+    <div id="asks"></div><div class="mid"><span id="mid" class="num">–</span><small id="spread">spread –</small></div><div id="bids"></div>
+    <div class="imb"><div id="imb"></div></div><div class="note num" id="imbt">Tekanan beli –</div></section>
+  <section class="card"><h3>Transaksi terbaru</h3><div id="trades"></div></section>
+  <section class="card btc-only"><h3>On-chain Bitcoin</h3><div class="tiles"><div class="tile"><span>Alamat aktif (harian)</span><b id="ac" class="num">–</b></div><div class="tile"><span>Hash rate</span><b id="hr" class="num">–</b></div><div class="tile"><span>Biaya cepat / 1 jam</span><b id="fee" class="num">–</b></div><div class="tile"><span>MVRV</span><b id="mvrv" class="num">–</b></div><div class="tile"><span>SOPR</span><b id="sopr" class="num">–</b></div><div class="tile"><span>BTC masuk bursa</span><b id="fin" class="num">–</b></div><div class="tile"><span>BTC keluar bursa</span><b id="fout" class="num">–</b></div><div class="tile"><span>Netflow bursa</span><b id="fnet" class="num">–</b></div></div>
+    <p class="note" id="ocd">Sumber: Coin Metrics Community, mempool.space</p></section>
+  <section class="card btc-only"><h3>Transaksi besar di mempool</h3><div id="wh"></div><p class="note" id="whs">Menghubungkan…</p></section>
+  <section class="card"><h3>Kalender ekonomi AS</h3><div id="cal"><p class="note">Memuat…</p></div></section>
+  <section class="card"><h3>Berita kripto</h3><div id="news"><p class="note">Memuat…</p></div>
+    <p class="note" style="margin-top:14px">Aliran dana ETF Bitcoin: tidak ada API gratis untuk browser. Lihat <a href="https://farside.co.uk/btc/" target="_blank" rel="noopener">farside.co.uk/btc</a>.</p></section>
+</div>
+</main>
 <script>
 const $ = id => document.getElementById(id);
 const fmt = (n, d = 2) => Number(n).toLocaleString('en-US', {minimumFractionDigits: d, maximumFractionDigits: d});
-const REST = 'https://api.bybit.com/v5';
 const TFS = ['1m','5m','15m','1h','4h','1d'];
 let tf = '1m', C = [], ws = null, retry = null;
+const COINS = {
+  BTC: {sym: 'BTCUSDT', name: 'Bitcoin', icon: 'BTC', base: 'BTC', quote: 'USDT', cg: 'bitcoin', bg: '#3a2a12', fg: '#f7a928'},
+  ETH: {sym: 'ETHUSDT', name: 'Ethereum', icon: 'ETH', base: 'ETH', quote: 'USDT', cg: 'ethereum', bg: '#1e2748', fg: '#8c9eff'},
+  IDR: {sym: 'USDTIDR', name: 'Tether', icon: 'USDT', base: 'USDT', quote: 'IDR', cg: 'tether', idr: true, bg: '#123a33', fg: '#2ecc8f'}
+};
+let coin = 'BTC', SYM = 'BTCUSDT', btcPx = 0, idrPx = 0, idrChg = 0;
 
 /* Chart */
 if (typeof LightweightCharts === 'undefined') {
@@ -200,44 +197,38 @@ $('tf').addEventListener('click', e => {
 });
 function markTf() { document.querySelectorAll('#tf button[data-t]').forEach(b => b.classList.toggle('on', b.dataset.t === tf)); }
 
+const IDX = {'1m': '1', '5m': '5', '15m': '15', '1h': '60', '4h': '240', '1d': '1D'};
+const TFSEC = {'1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400};
+const BNH = ['https://api.binance.com', 'https://data-api.binance.vision'];
+async function klines(t, limit) {
+  let err;
+  for (const h of BNH) {
+    try {
+      const j = await getJ(`${h}/api/v3/klines?symbol=${COINS[coin].sym}&interval=${t}&limit=${limit}`);
+      return j.map(k => ({time: +k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5]}));
+    } catch (e) { err = e; }
+  }
+  throw err;
+}
 async function setTf(t) {
-  tf = t; markTf();
-  connect();
+  tf = t; markTf(); connect();
+  const my = coin;
   try {
-    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
-    const r = await fetch(`${REST}/market/kline?category=spot&symbol=BTCUSDT&interval=${IV[tf]}&limit=500`, {signal: ctl.signal});
-    clearTimeout(to);
-    const j = await r.json();
-    if (!j.result || !j.result.list) throw new Error(j.retMsg || 'respons kosong');
-    C = j.result.list.reverse().map(k => ({time: +k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[5]}));
-    redraw(true); chart.timeScale().fitContent(); drawLevels();
-  } catch (e) { status(false, 'Tidak bisa mengambil data dari Bybit (' + (e.name === 'AbortError' ? 'waktu habis' : e.message) + '). Kemungkinan diblokir; coba VPN atau DNS lain.'); }
+    const d = await klines(tf, 500);
+    if (my !== coin || tf !== t) return;
+    if (!d.length) throw new Error('data kosong');
+    C = d; redraw(true); chart.timeScale().fitContent(); drawLevels();
+  } catch (e) { status(false, 'Tidak bisa mengambil data ' + 'Binance' + ' (' + (e.name === 'AbortError' ? 'waktu habis' : e.message) + '). Kemungkinan diblokir; coba VPN atau DNS lain.'); }
 }
 
-/* WebSocket Bybit (spot) */
+/* WebSocket Binance (spot) */
 function status(on, text) { $('st').classList.toggle('on', on); $('stt').textContent = text; }
 let ping = null, book = {b: new Map(), a: new Map()};
 function connect() {
-  clearTimeout(retry); clearInterval(ping);
+  clearTimeout(retry);
   if (ws) { ws.onclose = null; ws.close(); }
   book = {b: new Map(), a: new Map()};
-  ws = new WebSocket('wss://stream.bybit.com/v5/public/spot');
-  const sock = ws;
-  setTimeout(() => { if (sock === ws && ws.readyState !== 1) status(false, 'WebSocket Bybit tidak merespons. Kemungkinan diblokir; coba VPN atau DNS lain.'); }, 8000);
-  ws.onopen = () => {
-    status(true, 'Live (Bybit)');
-    ws.send(JSON.stringify({op: 'subscribe', args: ['tickers.BTCUSDT', `kline.${IV[tf]}.BTCUSDT`, 'publicTrade.BTCUSDT', 'orderbook.50.BTCUSDT']}));
-    ping = setInterval(() => ws.readyState === 1 && ws.send(JSON.stringify({op: 'ping'})), 20000);
-  };
-  ws.onclose = () => { clearInterval(ping); status(false, 'Terputus, mencoba lagi…'); retry = setTimeout(connect, 5000); };
-  ws.onmessage = m => {
-    const d = JSON.parse(m.data);
-    if (!d.topic) return;
-    if (d.topic.startsWith('tickers')) onTicker(d.data);
-    else if (d.topic.startsWith('kline')) d.data.forEach(onKline);
-    else if (d.topic.startsWith('publicTrade')) d.data.forEach(onTrade);
-    else if (d.topic.startsWith('orderbook')) onBook(d);
-  };
+  ws = null; startStream();
 }
 
 let lastPrice = 0;
@@ -246,10 +237,13 @@ function onTicker(d) {
   const p = +d.lastPrice, pct = +d.price24hPcnt * 100, diff = p - +d.prevPrice24h;
   $('price').textContent = fmt(p);
   $('price').className = 'num ' + (p >= lastPrice ? 'up' : 'down'); lastPrice = p;
-  $('chg').textContent = `${pct >= 0 ? '+' : ''}${fmt(diff)}  (${pct >= 0 ? '+' : ''}${pct.toFixed(2)}%)`;
+  $('chg').textContent = `${pct >= 0 ? '+' : ''}${fmt(diff)} · 24j`;
   $('chg').className = 'num ' + (pct >= 0 ? 'up' : 'down');
   $('hi').textContent = fmt(d.highPrice24h); $('lo').textContent = fmt(d.lowPrice24h);
   $('vb').textContent = fmt(d.volume24h, 0); $('vq').textContent = fmt(d.turnover24h, 0);
+  $('p24').className = 'pill ' + (pct >= 0 ? 'up' : 'down'); $('p24').textContent = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(2) + '%';
+  pc('c24', pct); rangeBar(p); cardSet(coin, p, pct); if (coin === 'BTC') btcPx = p;
+  $('upd').textContent = 'Update ' + new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}).replace(':', '.');
 }
 function onKline(k) {
   const c = {time: +k.start / 1000, open: +k.open, high: +k.high, low: +k.low, close: +k.close, volume: +k.volume};
@@ -288,21 +282,23 @@ function onBook(d) {
   $('imbt').textContent = `Bid ${pct.toFixed(1)}% · Ask ${(100 - pct).toFixed(1)}% (20 level)`;
 }
 
-/* Futures (perpetual linear): funding, open interest, long/short */
+/* Futures perpetual Binance: funding, open interest, long/short */
 async function futures() {
+  if (COINS[coin].idr) return;
+  const my = coin, F = 'https://fapi.binance.com';
   try {
-    const t = await fetch(`${REST}/market/tickers?category=linear&symbol=BTCUSDT`).then(r => r.json());
-    const x = t.result.list[0];
-    $('mark').textContent = fmt(x.markPrice);
-    const fr = +x.fundingRate * 100;
+    const [p, o] = await Promise.all([getJ(`${F}/fapi/v1/premiumIndex?symbol=${SYM}`), getJ(`${F}/fapi/v1/openInterest?symbol=${SYM}`)]);
+    if (my !== coin) return;
+    $('mark').textContent = fmt(p.markPrice);
+    const fr = +p.lastFundingRate * 100;
     $('fund').textContent = fr.toFixed(4) + '%'; $('fund').className = 'num ' + (fr >= 0 ? 'up' : 'down');
-    $('fnext').textContent = new Date(+x.nextFundingTime).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
-    $('oi').textContent = fmt(x.openInterest, 0);
+    $('fnext').textContent = new Date(p.nextFundingTime).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+    $('oi').textContent = fmt(o.openInterest, 0);
   } catch (e) { /* data futures opsional */ }
   try {
-    const l = await fetch(`${REST}/market/account-ratio?category=linear&symbol=BTCUSDT&period=5min&limit=1`).then(r => r.json());
-    const r0 = l.result.list[0];
-    if (r0) $('ls').textContent = `${(+r0.buyRatio * 100).toFixed(1)}% / ${(+r0.sellRatio * 100).toFixed(1)}%`;
+    const l = await getJ(`${F}/futures/data/globalLongShortAccountRatio?symbol=${SYM}&period=5m&limit=1`);
+    if (my !== coin) return;
+    if (l[0]) $('ls').textContent = `${(+l[0].longAccount * 100).toFixed(1)}% / ${(+l[0].shortAccount * 100).toFixed(1)}%`;
   } catch (e) {}
 }
 
@@ -349,7 +345,7 @@ function whales() {
     const row = el('div', null, 'row'), a = el('a', d.x.hash.slice(0, 10) + '…');
     if (/^[0-9a-f]{64}$/.test(d.x.hash)) { a.href = 'https://mempool.space/tx/' + d.x.hash; a.target = '_blank'; a.rel = 'noopener'; }
     a.style.color = 'var(--gold)';
-    row.append(el('span', fmt(btc, 1) + ' BTC'), el('span', '≈ $' + fmt(btc * lastPrice / 1e6, 1) + ' jt'), a);
+    row.append(el('span', fmt(btc, 1) + ' BTC'), el('span', '≈ $' + fmt(btc * btcPx / 1e6, 1) + ' jt'), a);
     $('wh').prepend(row); while ($('wh').children.length > 12) $('wh').lastChild.remove();
   };
   w.onclose = () => { $('whs').textContent = 'Terputus dari ws.blockchain.info, mencoba lagi…'; setTimeout(whales, 5000); };
@@ -358,11 +354,12 @@ function whales() {
 const FG = {'Extreme Fear': 'Ketakutan ekstrem', 'Fear': 'Takut', 'Neutral': 'Netral', 'Greed': 'Serakah', 'Extreme Greed': 'Serakah ekstrem'};
 async function fng() {
   try {
-    const d = (await getJ('https://api.alternative.me/fng/?limit=8')).data, v = +d[0].value;
+    const d = (await getJ('https://api.alternative.me/fng/?limit=2')).data, v = +d[0].value, t = Math.PI * v / 100;
     set('fg', v, v < 50 ? 'down' : v > 50 ? 'up' : '');
     $('fgc').textContent = FG[d[0].value_classification] || d[0].value_classification;
-    $('fgh').textContent = `Kemarin ${d[1].value} · Seminggu lalu ${d[7].value} · Sumber: alternative.me`;
-  } catch (e) { $('fgc').textContent = 'Fear & Greed tidak bisa dimuat'; }
+    $('fgh').textContent = ' · kmrn ' + d[1].value;
+    $('gdot').setAttribute('cx', (50 - 40 * Math.cos(t)).toFixed(1)); $('gdot').setAttribute('cy', (50 - 40 * Math.sin(t)).toFixed(1));
+  } catch (e) { $('fgc').textContent = 'tidak bisa dimuat'; }
 }
 async function calendar() {
   const box = $('cal');
@@ -443,9 +440,11 @@ function drawLevels() {
   }
 }
 async function pivotData() {
+  const my = coin;
   try {
-    const j = await getJ(`${REST}/market/kline?category=spot&symbol=BTCUSDT&interval=D&limit=2`);
-    const k = j.result.list[1]; dayP = {H: +k[2], L: +k[3], c: +k[4]}; drawLevels();
+    const l = await klines('1d', 3);
+    if (my !== coin || l.length < 2) return;
+    const k = l[l.length - 2]; dayP = {H: k.high, L: k.low, c: k.close}; drawLevels();
   } catch (e) { /* pivot opsional */ }
 }
 /* Area beli/jual + sinyal untuk spot (long only), aturan sederhana dan tanpa lookahead */
@@ -490,7 +489,6 @@ function buySell() {
   }
   const M = {buy: ['belowBar', '#3fb8a0', 'arrowUp', 'BELI'], sell: ['aboveBar', '#e5645a', 'arrowDown', 'JUAL'], stop: ['aboveBar', '#e0b050', 'arrowDown', 'STOP']};
   candle.setMarkers(show.zn ? mk.map(({c, k}) => ({time: c.time, position: M[k][0], color: M[k][1], shape: M[k][2], text: M[k][3]})) : []);
-  // area saat ini
   const a = at[at.length - 1], last = C[C.length - 1].close, {s, r} = nearLevels(C);
   let zone = 'Netral', cls = '';
   if (a && s && last <= s.price + K * a) { zone = 'Zona beli'; cls = 'up'; }
@@ -506,8 +504,90 @@ function buySell() {
   const unreal = pos ? `, terbuka ${((last / pos.p - 1) * 100).toFixed(2)}%` : '';
   set('bt', n ? `${n} trade · menang ${(win / n * 100).toFixed(0)}% · ${(tot * 100).toFixed(1)}% vs tahan ${(bh * 100).toFixed(1)}%${unreal}` : `belum ada trade selesai${unreal}`);
 }
-
 markLayers(); pivotData(); setInterval(drawLevels, 20000); setInterval(pivotData, 300000);
+
+/* Kartu ringkasan: CoinGecko, performa, rentang S1-R1 */
+const bigf = n => n >= 1e12 ? (n / 1e12).toFixed(2) + ' T' : n >= 1e9 ? (n / 1e9).toFixed(2) + ' B' : n >= 1e6 ? (n / 1e6).toFixed(2) + ' M' : fmt(n, 0);
+function pc(id, p) { set(id, (p >= 0 ? '+' : '') + p.toFixed(2) + '%', p >= 0 ? 'up' : 'down'); }
+async function market() {
+  try {
+    const m = (await getJ(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${COINS[coin].cg}`))[0];
+    set('mc', '$' + bigf(m.market_cap)); set('vol', '$' + bigf(m.total_volume));
+    set('vm', (m.total_volume / m.market_cap * 100).toFixed(2) + '%');
+    set('supl', (m.circulating_supply / 1e6).toFixed(2) + 'M / ' + (m.max_supply ? (m.max_supply / 1e6).toFixed(2) + 'M' : '∞'));
+    $('rank').textContent = `${COINS[coin].base}/${COINS[coin].quote} · Rank #${m.market_cap_rank}`;
+  } catch (e) {}
+  try {
+    const g = (await getJ('https://api.coingecko.com/api/v3/global')).data;
+    set('gmc', '$' + bigf(g.total_market_cap.usd)); set('gdom', g.market_cap_percentage.btc.toFixed(1) + '%');
+    const c = g.market_cap_change_percentage_24h_usd; $('gmcc').textContent = (c >= 0 ? '+' : '') + c.toFixed(2) + '% 24j'; $('gmcc').style.color = c >= 0 ? 'var(--up)' : 'var(--down)';
+  } catch (e) {}
+}
+async function perf() {
+  const my = coin;
+  try {
+    const l = await klines('1d', 366);
+    if (my !== coin) return;
+    const now = l[l.length - 1].close;
+    [['c7', 7], ['c30', 30], ['c90', 90], ['c1y', 365]].forEach(([id, n]) => l.length > n ? pc(id, (now / l[l.length - 1 - n].close - 1) * 100) : set(id, '–'));
+  } catch (e) {}
+}
+function rangeBar(p) {
+  if (!dayP) return;
+  const P = (dayP.H + dayP.L + dayP.c) / 3, S1 = 2 * P - dayP.H, R1 = 2 * P - dayP.L, x = (p - S1) / (R1 - S1);
+  $('dot').style.left = Math.min(1, Math.max(0, x)) * 100 + '%';
+  $('s1').textContent = 'S1 ' + fmt(S1); $('r1').textContent = 'R1 ' + fmt(R1);
+  $('rpos').textContent = x < 0 ? 'Di bawah S1' : x > 1 ? 'Di atas R1' : x < .33 ? 'Dekat S1' : x > .67 ? 'Dekat R1' : 'Tengah range';
+}
+$('rf').onclick = () => { setTf(tf); futures(); onchain(); chain(); fng(); calendar(); news(); market(); perf(); pivotData(); };
+market(); perf(); setInterval(market, 60000); setInterval(perf, 300000);
+
+/* Pilihan coin + USDT/IDR via Binance */
+$('coins').innerHTML = Object.entries(COINS).map(([k, c]) => `<button class="coincard${k === coin ? ' on' : ''}" data-k="${k}"><div class="r"><div class="ci" style="background:${c.bg};color:${c.fg}">${c.icon}</div><div><b>${c.name}</b><small>${c.base}/${c.quote}</small></div></div><span class="p num" id="cp-${k}">–</span><span class="c num" id="cc-${k}"></span></button>`).join('');
+function cardSet(k, p, c) {
+  const e = $('cc-' + k); if (!e) return;
+  $('cp-' + k).textContent = fmt(p); e.textContent = (c >= 0 ? '▲ ' : '▼ ') + Math.abs(c).toFixed(2) + '%'; e.className = 'c num ' + (c >= 0 ? 'up' : 'down');
+}
+async function coinCards() {
+  try {
+    const j = await getJ('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,tether&vs_currencies=usd,idr&include_24hr_change=true');
+    btcPx = j.bitcoin.usd; idrPx = j.tether.idr; idrChg = j.tether.idr_24h_change || 0;
+    [['BTC', j.bitcoin.usd, j.bitcoin.usd_24h_change], ['ETH', j.ethereum.usd, j.ethereum.usd_24h_change], ['IDR', idrPx, idrChg]].forEach(([k, p, c]) => { if (k !== coin) cardSet(k, p, c); });
+  } catch (e) {}
+}
+const WSH = ['wss://stream.binance.com:9443', 'wss://data-stream.binance.vision']; let wsI = 0;
+function startStream() {
+  status(false, 'Menghubungkan ke Binance…');
+  const n = SYM.toLowerCase(), q = `${n}@ticker/${n}@kline_${tf}/${n}@trade/${n}@depth20@100ms`;
+  let opened = false;
+  const sock = ws = new WebSocket(`${WSH[wsI]}/stream?streams=${q}`);
+  setTimeout(() => { if (sock === ws && ws.readyState !== 1) { status(false, 'WebSocket Binance tidak merespons, mencoba server lain. Kalau tetap gagal, kemungkinan diblokir; coba VPN atau DNS lain.'); wsI = (wsI + 1) % WSH.length; sock.close(); } }, 8000);
+  sock.onopen = () => { opened = true; status(true, 'Live (Binance)'); };
+  sock.onclose = () => { if (sock !== ws) return; status(false, 'Terputus, mencoba lagi…'); if (!opened) wsI = (wsI + 1) % WSH.length; retry = setTimeout(connect, 3000); };
+  sock.onmessage = m => {
+    const {stream, data: d} = JSON.parse(m.data);
+    if (stream.endsWith('@ticker')) onTicker({lastPrice: d.c, prevPrice24h: d.o, price24hPcnt: +d.P / 100, highPrice24h: d.h, lowPrice24h: d.l, volume24h: d.v, turnover24h: d.q});
+    else if (stream.includes('@kline')) onKline({start: d.k.t, open: d.k.o, high: d.k.h, low: d.k.l, close: d.k.c, volume: d.k.v});
+    else if (stream.endsWith('@trade')) onTrade({S: d.m ? 'Sell' : 'Buy', p: d.p, v: d.q, T: d.T});
+    else onBook({type: 'snapshot', data: {b: d.bids, a: d.asks}});
+  };
+}
+function setCoin(k) {
+  coin = k; const c = COINS[k]; SYM = c.sym; lastPrice = 0; dayP = null;
+  C = []; [candle, vol, ema20, ema50].forEach(x => x.setData([])); candle.setMarkers([]);
+  lines.forEach(l => candle.removePriceLine(l)); lines = [];
+  ['asks', 'bids', 'trades'].forEach(i => $(i).replaceChildren());
+  ['price', 'chg', 'p24', 'hi', 'lo', 'vb', 'vq', 'c24', 'c7', 'c30', 'c90', 'c1y', 'mc', 'vol', 'vm', 'supl', 'sup', 'res', 'zn', 'sg', 'bt', 'mark', 'fund', 'fnext', 'oi', 'ls', 's1', 'r1', 'rpos'].forEach(i => { $(i).textContent = '–'; });
+  $('hname').textContent = c.name; $('cicon').textContent = c.icon; $('cicon').style.cssText = `background:${c.bg};color:${c.fg}`;
+  $('rank').textContent = `${c.base}/${c.quote}`;
+  $('vb').previousElementSibling.textContent = `Volume (${c.base})`; $('vq').previousElementSibling.textContent = `Volume (${c.quote})`;
+  document.querySelectorAll('.btc-only').forEach(e => { e.hidden = k !== 'BTC'; });
+  document.querySelectorAll('.perp-only').forEach(e => { e.hidden = !!c.idr; });
+  document.querySelectorAll('#coins .coincard').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  setTf(tf); futures(); market(); perf(); pivotData(); coinCards();
+}
+$('coins').onclick = e => { const b = e.target.closest('[data-k]'); if (b && b.dataset.k !== coin) setCoin(b.dataset.k); };
+coinCards(); setInterval(coinCards, 60000);
 
 markTf(); setTf('1m'); futures(); setInterval(futures, 15000);
 </script>
